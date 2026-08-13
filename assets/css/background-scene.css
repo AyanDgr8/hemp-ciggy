@@ -1,0 +1,35 @@
+/* Keep the 3D cigarette strictly in the background.
+ *
+ * The scene wrapper ships as `fixed inset-0 z-[1]`. Any content block that
+ * never got an explicit z-index therefore paints *below* it — the ledger
+ * table, the ritual marquee and the entire footer are all in that group,
+ * which is why the cigarette was drawn on top of that text.
+ *
+ * Dropping the scene to z-index:0 and lifting every content layer to 1 keeps
+ * the render order deterministic: scene at the back, content in front, header
+ * on top. The scene is position:fixed, so it stays behind the whole page as
+ * you scroll rather than being confined to the hero.
+ */
+
+[data-testid="cigarette-canvas"] {
+  z-index: 0 !important;
+}
+
+/* The inner wrapper re-enables pointer events, which let the full-viewport
+ * canvas swallow clicks and text selection intended for the content above it.
+ */
+[data-testid="cigarette-canvas"],
+[data-testid="cigarette-canvas"] * {
+  pointer-events: none !important;
+}
+
+/* Every content layer sits in front of the scene. */
+.App > main > section,
+.App > footer {
+  position: relative;
+  z-index: 1;
+}
+
+.App > header {
+  z-index: 50;
+}
